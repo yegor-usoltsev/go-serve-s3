@@ -1,0 +1,69 @@
+---
+version: 1
+
+before:
+  hooks:
+    - go mod tidy
+
+report_sizes: true
+
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - darwin
+      - linux
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ignore:
+      - goos: windows
+        goarch: arm64
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w
+
+dockers:
+  - image_templates:
+      - "yusoltsev/go-serve-s3:v{{ .Version }}-amd64"
+      - "ghcr.io/yegor-usoltsev/go-serve-s3:v{{ .Version }}-amd64"
+    dockerfile: Dockerfile
+    use: buildx
+    build_flag_templates:
+      - "--platform=linux/amd64"
+  - image_templates:
+      - "yusoltsev/go-serve-s3:v{{ .Version }}-arm64"
+      - "ghcr.io/yegor-usoltsev/go-serve-s3:v{{ .Version }}-arm64"
+    dockerfile: Dockerfile
+    use: buildx
+    build_flag_templates:
+      - "--platform=linux/amd64"
+    goarch: arm64
+
+docker_manifests:
+  - name_template: "yusoltsev/go-serve-s3:v{{ .Version }}"
+    image_templates:
+      - "yusoltsev/go-serve-s3:v{{ .Version }}-amd64"
+      - "yusoltsev/go-serve-s3:v{{ .Version }}-arm64"
+  - name_template: "ghcr.io/yegor-usoltsev/go-serve-s3:v{{ .Version }}"
+    image_templates:
+      - "ghcr.io/yegor-usoltsev/go-serve-s3:v{{ .Version }}-amd64"
+      - "ghcr.io/yegor-usoltsev/go-serve-s3:v{{ .Version }}-arm64"
+  - name_template: "yusoltsev/go-serve-s3:latest"
+    image_templates:
+      - "yusoltsev/go-serve-s3:v{{ .Version }}-amd64"
+      - "yusoltsev/go-serve-s3:v{{ .Version }}-arm64"
+  - name_template: "ghcr.io/yegor-usoltsev/go-serve-s3:latest"
+    image_templates:
+      - "ghcr.io/yegor-usoltsev/go-serve-s3:v{{ .Version }}-amd64"
+      - "ghcr.io/yegor-usoltsev/go-serve-s3:v{{ .Version }}-arm64"
+
+archives:
+  - format_overrides:
+      - goos: windows
+        format: zip
+
+release:
+  name_template: "v{{ .Version }}"

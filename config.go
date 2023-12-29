@@ -10,7 +10,7 @@ import (
 const envPrefix = "app"
 
 type Config struct {
-	ServerHost string `split_words:"true" default:"localhost"`
+	ServerHost string `split_words:"true" default:"0.0.0.0"`
 	ServerPort uint16 `split_words:"true" default:"8080"`
 	S3Bucket   string `split_words:"true" required:"true"`
 	S3Region   string `split_words:"true" required:"true"`
