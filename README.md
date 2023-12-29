@@ -12,7 +12,7 @@ A compact tool for serving static files from AWS S3 object storage with in-memor
 | KEY               | TYPE      | DEFAULT   |
 |-------------------|-----------|-----------|
 | `APP_SERVER_HOST` | `String`  | `0.0.0.0` |
-| `APP_SERVER_PORT` | `Integer` | `3000`    |
+| `APP_SERVER_PORT` | `Integer` | `8080`    |
 | `APP_S3_BUCKET`   | `String`  |           |
 | `APP_S3_REGION`   | `String`  |           |
 
