@@ -4,7 +4,8 @@
     ":reviewer(yegor-usoltsev)",
     "config:recommended",
     "group:all",
-    "schedule:weekends",
+    "schedule:monthly",
     ":disableDependencyDashboard"
-  ]
+  ],
+  "postUpdateOptions": ["gomodTidy", "gomodUpdateImportPaths", "gomodMassage"]
 }
