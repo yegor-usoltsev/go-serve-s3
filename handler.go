@@ -60,5 +60,6 @@ func s3Handler(bucket, region string) http.Handler {
 	}
 	s3Client := s3.NewFromConfig(awsCfg, func(o *s3.Options) { o.Region = region })
 	s3FS := s3fs.New(s3Client, bucket)
+	s3fs.WithReadSeeker(s3FS)
 	return cacheClient.Middleware(http.FileServer(http.FS(s3FS)))
 }
