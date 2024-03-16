@@ -4,7 +4,7 @@ go 1.22.1
 
 require (
 	github.com/aws/aws-sdk-go-v2/config v1.27.7
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.51.4
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.52.1
 	github.com/jszwec/s3fs/v2 v2.0.0
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/victorspringer/http-cache v0.0.0-20240130140836-2c4f8454e6e2
