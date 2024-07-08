@@ -1,5 +1,5 @@
 ---
-version: 1
+version: 2
 
 before:
   hooks:
@@ -16,7 +16,7 @@ builds:
       - -s -w
 
 changelog:
-  skip: true
+  disable: true
 
 archives:
   - format_overrides:
