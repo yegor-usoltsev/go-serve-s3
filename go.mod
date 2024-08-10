@@ -1,6 +1,6 @@
 module github.com/yegor-usoltsev/go-serve-s3
 
-go 1.22.5
+go 1.22.6
 
 require (
 	github.com/aws/aws-sdk-go-v2/config v1.27.27
