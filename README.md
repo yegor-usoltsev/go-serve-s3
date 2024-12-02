@@ -4,6 +4,7 @@
 [![GitHub Release](https://img.shields.io/github/v/release/yegor-usoltsev/go-serve-s3?sort=semver)](https://github.com/yegor-usoltsev/go-serve-s3/releases)
 [![Docker Image (docker.io)](https://img.shields.io/docker/v/yusoltsev/go-serve-s3?label=docker.io&sort=semver)](https://hub.docker.com/r/yusoltsev/go-serve-s3)
 [![Docker Image (ghcr.io)](https://img.shields.io/docker/v/yusoltsev/go-serve-s3?label=ghcr.io&sort=semver)](https://github.com/yegor-usoltsev/go-serve-s3/pkgs/container/go-serve-s3)
+[![Docker Image Size](https://img.shields.io/docker/image-size/yusoltsev/go-serve-s3?sort=semver&arch=amd64)](https://hub.docker.com/r/yusoltsev/go-serve-s3/tags)
 
 A compact tool for serving static files from AWS S3 object storage with in-memory caching.
 
