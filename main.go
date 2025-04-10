@@ -4,10 +4,11 @@ import (
 	"context"
 	"os"
 	"os/signal"
+	"syscall"
 )
 
 func main() {
-	ctx, cancelCtx := signal.NotifyContext(context.Background(), os.Interrupt, os.Kill)
+	ctx, cancelCtx := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer cancelCtx()
 
 	cfg := NewConfig()

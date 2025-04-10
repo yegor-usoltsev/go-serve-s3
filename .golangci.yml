@@ -1,0 +1,16 @@
+---
+version: "2"
+
+linters:
+  default: standard
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+
+run:
+  timeout: 100s
+
+severity:
+  default: error
