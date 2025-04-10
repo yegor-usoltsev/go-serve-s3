@@ -6,13 +6,21 @@
     "schedule:weekends",
     ":reviewer(yegor-usoltsev)"
   ],
-  "postUpdateOptions": ["gomodTidy", "gomodUpdateImportPaths", "gomodMassage"],
+  "postUpdateOptions": [
+    "gomodTidy",
+    "gomodUpdateImportPaths",
+    "gomodMassage"
+  ],
   "customManagers": [
     {
       "customType": "regex",
       "description": "Update Go version",
-      "fileMatch": ["(^|/)go\\.mod$"],
-      "matchStrings": ["\\sgo (?<currentValue>.+?)\\s"],
+      "fileMatch": [
+        "(^|/)go\\.mod$"
+      ],
+      "matchStrings": [
+        "\\sgo (?<currentValue>.+?)\\s"
+      ],
       "datasourceTemplate": "golang-version",
       "depNameTemplate": "go"
     }
