@@ -21,7 +21,7 @@ changelog:
 archives:
   - format_overrides:
       - goos: windows
-        format: zip
+        formats: zip
 
 checksum:
   name_template: checksums.sha256.txt
