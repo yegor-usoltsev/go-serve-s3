@@ -1,6 +1,7 @@
 # go-serve-s3
 
 [![Build Status](https://github.com/yegor-usoltsev/go-serve-s3/actions/workflows/ci.yml/badge.svg)](https://github.com/yegor-usoltsev/go-serve-s3/actions)
+[![Codecov](https://codecov.io/gh/yegor-usoltsev/go-serve-s3/graph/badge.svg?token=5I7K9PUI0P)](https://codecov.io/gh/yegor-usoltsev/go-serve-s3)
 [![GitHub Release](https://img.shields.io/github/v/release/yegor-usoltsev/go-serve-s3?sort=semver)](https://github.com/yegor-usoltsev/go-serve-s3/releases)
 [![Docker Image (docker.io)](https://img.shields.io/docker/v/yusoltsev/go-serve-s3?label=docker.io&sort=semver)](https://hub.docker.com/r/yusoltsev/go-serve-s3)
 [![Docker Image (ghcr.io)](https://img.shields.io/docker/v/yusoltsev/go-serve-s3?label=ghcr.io&sort=semver)](https://github.com/yegor-usoltsev/go-serve-s3/pkgs/container/go-serve-s3)
