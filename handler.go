@@ -3,9 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
-	"time"
 
 	awsConfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -14,52 +12,52 @@ import (
 	"github.com/victorspringer/http-cache/adapter/memory"
 )
 
-const (
-	cachingAlgorithm     = memory.LRU
-	cachingCapacityItems = 1024
-	cachingCapacityBytes = 50 * 1024 * 1024 // 50 MiB
-	cachingTTL           = 10 * time.Minute
-)
-
 type Handler struct {
 	*http.ServeMux
 }
 
 func NewHandler(cfg Config) *Handler {
 	h := &Handler{ServeMux: http.NewServeMux()}
-	h.HandleFunc("/health", healthHandler)
-	h.Handle("/", s3Handler(cfg.S3Bucket, cfg.S3Region))
+	h.HandleFunc("GET /health", HealthHandler)
+	h.Handle("GET /", NewS3Handler(cfg))
 	return h
 }
 
-func healthHandler(w http.ResponseWriter, _ *http.Request) {
+func HealthHandler(w http.ResponseWriter, _ *http.Request) {
 	_, _ = fmt.Fprint(w, "OK")
 }
 
-func s3Handler(bucket, region string) http.Handler {
+func NewS3Handler(cfg Config) http.Handler {
 	memoryAdapter, err := memory.NewAdapter(
-		memory.AdapterWithAlgorithm(cachingAlgorithm),
-		memory.AdapterWithCapacity(cachingCapacityItems),
-		memory.AdapterWithStorageCapacity(cachingCapacityBytes),
+		memory.AdapterWithAlgorithm(memory.LRU),
+		memory.AdapterWithCapacity(cfg.CachingCapacityItems),
+		memory.AdapterWithStorageCapacity(cfg.CachingCapacityBytes),
 	)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	cacheClient, err := cache.NewClient(
 		cache.ClientWithAdapter(memoryAdapter),
 		cache.ClientWithExpiresHeader(),
-		cache.ClientWithTTL(cachingTTL),
+		cache.ClientWithTTL(cfg.CachingTTL),
 	)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	awsCfg, err := awsConfig.LoadDefaultConfig(context.Background())
 	if err != nil {
-		log.Print("Couldn't load AWS configuration. Have you set up your AWS account?")
-		log.Fatal(err)
+		panic(err)
 	}
-	s3Client := s3.NewFromConfig(awsCfg, func(o *s3.Options) { o.Region = region })
-	s3FS := s3fs.New(s3Client, bucket)
-	s3fs.WithReadSeeker(s3FS)
+	s3Client := s3.NewFromConfig(awsCfg, func(o *s3.Options) {
+		o.DisableLogOutputChecksumValidationSkipped = true
+		if cfg.S3Region != "" {
+			o.Region = cfg.S3Region
+		}
+		if cfg.S3EndpointURL != "" {
+			o.BaseEndpoint = &cfg.S3EndpointURL
+		}
+		o.UsePathStyle = cfg.S3UsePathStyle
+	})
+	s3FS := s3fs.New(s3Client, cfg.S3Bucket, s3fs.WithReadSeeker)
 	return cacheClient.Middleware(http.FileServer(http.FS(s3FS)))
 }

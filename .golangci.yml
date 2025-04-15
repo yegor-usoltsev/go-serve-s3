@@ -2,14 +2,60 @@
 version: "2"
 
 linters:
-  default: standard
+  default: all
+  disable:
+    - cyclop
+    - depguard
+    - funlen
+    - gocognit
+    - gocyclo
+    - lll
+    - maintidx
+    - mnd
+    - nlreturn
+    - nonamedreturns
+    - tagalign
+    - testpackage
+    - varnamelen
+    - whitespace
+    - wsl
+  exclusions:
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      - path: (.+)_test\.go
+        linters:
+          - dupl
+          - exhaustruct
+          - forcetypeassert
+          - gosec
+          - wrapcheck
+  settings:
+    forbidigo:
+      forbid:
+        - pattern: "^(print(|ln)|fmt\\.Print(|f|ln)|log\\.(Print(|f|ln)|Fatal(|f|ln)|Panic(|f|ln))|os\\.Exit)$"
+          msg: Please use slog for logging, return errors, or panic instead when appropriate.
+    sloglint:
+      kv-only: true
+      static-msg: true
+      msg-style: lowercased
+      key-naming-case: snake
 
 formatters:
   enable:
     - gofmt
     - goimports
 
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
+  uniq-by-line: false
+
 run:
+  tests: true
   timeout: 100s
 
 severity:

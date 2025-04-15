@@ -11,14 +11,19 @@ A compact tool for serving static files from AWS S3 object storage with in-memor
 
 ### Environment Variables
 
-| KEY                     | TYPE      | DEFAULT   |
-|-------------------------|-----------|-----------|
-| `APP_SERVER_HOST`       | `String`  | `0.0.0.0` |
-| `APP_SERVER_PORT`       | `Integer` | `8080`    |
-| `APP_S3_BUCKET`         | `String`  |           |
-| `APP_S3_REGION`         | `String`  |           |
-| `AWS_ACCESS_KEY_ID`     | `String`  |           |
-| `AWS_SECRET_ACCESS_KEY` | `String`  |           |
+| KEY                          | TYPE       | DEFAULT             | REQUIRED |
+| ---------------------------- | ---------- | ------------------- | -------- |
+| `APP_SERVER_HOST`            | `String`   | `0.0.0.0`           | Yes      |
+| `APP_SERVER_PORT`            | `Integer`  | `8080`              | Yes      |
+| `APP_S3_BUCKET`              | `String`   |                     | Yes      |
+| `APP_S3_REGION`              | `String`   |                     | No       |
+| `APP_S3_ENDPOINT_URL`        | `String`   |                     | No       |
+| `APP_S3_USE_PATH_STYLE`      | `Boolean`  |                     | No       |
+| `APP_CACHING_CAPACITY_ITEMS` | `Integer`  | `1024`              | Yes      |
+| `APP_CACHING_CAPACITY_BYTES` | `Integer`  | `52428800` (50 MiB) | Yes      |
+| `APP_CACHING_TTL`            | `Duration` | `10m` (10 minutes)  | Yes      |
+
+You should also provide valid AWS credentials using `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`, or through other supported environment variables. For details, refer to the [AWS SDK documentation](https://docs.aws.amazon.com/sdkref/latest/guide/environment-variables.html).
 
 ## Docker Images
 
