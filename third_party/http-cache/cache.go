@@ -138,12 +138,11 @@ func (c *Client) Middleware(next http.Handler) http.Handler {
 			next.ServeHTTP(rw, r)
 
 			statusCode := rw.statusCode
-			value := rw.body
 			now := time.Now()
 			expires := now.Add(c.ttl)
 			if statusCode < 400 {
 				response := Response{
-					Value:      value,
+					Value:      rw.body.Bytes(),
 					Header:     rw.Header(),
 					Expiration: expires,
 					LastAccess: now,
@@ -297,7 +296,7 @@ func ClientWithExpiresHeader() ClientOption {
 type responseWriter struct {
 	http.ResponseWriter
 	statusCode int
-	body       []byte
+	body       bytes.Buffer
 }
 
 func (w *responseWriter) WriteHeader(statusCode int) {
@@ -306,6 +305,6 @@ func (w *responseWriter) WriteHeader(statusCode int) {
 }
 
 func (w *responseWriter) Write(b []byte) (int, error) {
-	w.body = append(w.body, b...)
+	w.body.Write(b)
 	return w.ResponseWriter.Write(b)
 }
