@@ -88,7 +88,6 @@ func TestS3Handler(t *testing.T) {
 	handler := NewS3Handler(cfg).ServeHTTP
 
 	t.Run("get root directory listing", func(t *testing.T) {
-		t.Skip("TODO")
 		t.Parallel()
 		url := "/"
 		assert.HTTPStatusCode(t, handler, http.MethodGet, url, nil, http.StatusOK)
@@ -103,7 +102,6 @@ func TestS3Handler(t *testing.T) {
 	})
 
 	t.Run("get big file", func(t *testing.T) {
-		t.Skip("TODO")
 		t.Parallel()
 		bigObjectName := "big-" + objectName
 		bigObjectContent := func() string {
