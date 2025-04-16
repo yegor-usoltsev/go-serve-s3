@@ -36,9 +36,8 @@ func NewServer(cfg Config, h http.Handler) *Server {
 
 func (s *Server) StartAsync() {
 	errCh := make(chan error, 1)
-	defer close(errCh)
-
 	go func() {
+		defer close(errCh)
 		l, err := net.Listen("tcp", s.Addr)
 		if err != nil {
 			slog.Error("http server unable to listen on address", "addr", s.Addr, "error", err)
@@ -51,7 +50,6 @@ func (s *Server) StartAsync() {
 			slog.Error("http server unable to handle requests", "error", err)
 		}
 	}()
-
 	if err := <-errCh; err != nil {
 		panic(err)
 	}
