@@ -38,8 +38,9 @@ func NewS3Handler(cfg Config) http.Handler {
 	}
 	cacheClient, err := cache.NewClient(
 		cache.ClientWithAdapter(memoryAdapter),
-		cache.ClientWithExpiresHeader(),
 		cache.ClientWithTTL(cfg.CachingTTL),
+		cache.ClientWithMethods([]string{http.MethodGet}),
+		cache.ClientWithExpiresHeader(),
 	)
 	if err != nil {
 		panic(err)

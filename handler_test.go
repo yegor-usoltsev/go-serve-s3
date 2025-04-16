@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -20,10 +21,10 @@ const (
 	bucketName    = "test-bucket"
 	region        = "us-east-1"
 	objectName    = "lorem-ipsum.txt"
-	objectContent = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+	objectContent = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.\n"
 )
 
-func setupMinio(t *testing.T) {
+func setupMinio(t *testing.T) *minio.Client {
 	t.Helper()
 	container, err := tcMinio.Run(t.Context(), "minio/minio:latest")
 	t.Cleanup(func() { require.NoError(t, tc.TerminateContainer(container)) })
@@ -47,6 +48,8 @@ func setupMinio(t *testing.T) {
 	t.Setenv("APP_S3_USE_PATH_STYLE", "true")
 	t.Setenv("AWS_ACCESS_KEY_ID", minioUser)
 	t.Setenv("AWS_SECRET_ACCESS_KEY", minioPassword)
+
+	return client
 }
 
 func TestNewHandler(t *testing.T) { //nolint:paralleltest
@@ -79,7 +82,7 @@ func TestHealthHandler(t *testing.T) {
 }
 
 func TestS3Handler(t *testing.T) {
-	setupMinio(t)
+	client := setupMinio(t)
 	cfg := NewConfigFromEnv()
 
 	handler := NewS3Handler(cfg).ServeHTTP
@@ -97,6 +100,27 @@ func TestS3Handler(t *testing.T) {
 		url := "/" + objectName
 		assert.HTTPStatusCode(t, handler, http.MethodGet, url, nil, http.StatusOK)
 		assert.HTTPBodyContains(t, handler, http.MethodGet, url, nil, objectContent)
+	})
+
+	t.Run("get big file", func(t *testing.T) {
+		t.Skip("TODO")
+		t.Parallel()
+		bigObjectName := "big-" + objectName
+		bigObjectContent := func() string {
+			var sb strings.Builder
+			for i := range 100 {
+				sb.WriteString(strconv.Itoa(i))
+				sb.WriteRune(' ')
+				sb.WriteString(objectContent)
+			}
+			return sb.String()
+		}()
+		_, err := client.PutObject(t.Context(), bucketName, bigObjectName, strings.NewReader(bigObjectContent), -1, minio.PutObjectOptions{})
+		require.NoError(t, err)
+
+		url := "/" + bigObjectName
+		assert.HTTPStatusCode(t, handler, http.MethodGet, url, nil, http.StatusOK)
+		assert.HTTPBodyContains(t, handler, http.MethodGet, url, nil, bigObjectContent)
 	})
 
 	t.Run("get non-existent file", func(t *testing.T) {
