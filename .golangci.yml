@@ -16,6 +16,7 @@ linters:
     - nonamedreturns
     - tagalign
     - testpackage
+    - tparallel
     - varnamelen
     - whitespace
     - wsl

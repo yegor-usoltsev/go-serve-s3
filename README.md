@@ -9,6 +9,36 @@
 
 A compact tool for serving static files from AWS S3 object storage with in-memory caching.
 
+## Usage
+
+### AWS S3
+
+Minimal example using AWS S3 (using credentials from host's `~/.aws` directory):
+
+```bash
+docker run -d \
+  -e APP_S3_BUCKET=my-bucket \
+  -v ~/.aws:/root/.aws:ro \
+  -p 8080:8080 \
+  yusoltsev/go-serve-s3:latest
+```
+
+### MinIO
+
+Minimal example using MinIO (local S3-compatible storage):
+
+```bash
+docker run -d \
+  -e APP_S3_BUCKET=my-bucket \
+  -e APP_S3_REGION=us-east-1 \
+  -e APP_S3_ENDPOINT_URL=http://minio:9000 \
+  -e APP_S3_USE_PATH_STYLE=true \
+  -e AWS_ACCESS_KEY_ID=minioadmin \
+  -e AWS_SECRET_ACCESS_KEY=minioadmin \
+  -p 8080:8080 \
+  yusoltsev/go-serve-s3:latest
+```
+
 ### Environment Variables
 
 | KEY                          | TYPE       | DEFAULT             | REQUIRED |
@@ -23,7 +53,9 @@ A compact tool for serving static files from AWS S3 object storage with in-memor
 | `APP_CACHING_CAPACITY_BYTES` | `Integer`  | `52428800` (50 MiB) | Yes      |
 | `APP_CACHING_TTL`            | `Duration` | `10m` (10 minutes)  | Yes      |
 
-You should also provide valid AWS credentials using `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`, or through other supported environment variables. For details, refer to the [AWS SDK documentation](https://docs.aws.amazon.com/sdkref/latest/guide/environment-variables.html).
+You should also provide valid AWS credentials using `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`, or through other
+supported environment variables. For details, refer to
+the [AWS SDK documentation](https://docs.aws.amazon.com/sdkref/latest/guide/environment-variables.html).
 
 ## Docker Images
 
