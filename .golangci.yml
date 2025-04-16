@@ -9,6 +9,7 @@ linters:
     - funlen
     - gocognit
     - gocyclo
+    - gomoddirectives
     - lll
     - maintidx
     - mnd
@@ -21,6 +22,11 @@ linters:
     - whitespace
     - wsl
   exclusions:
+    paths:
+      - builtin/
+      - examples/
+      - third_party/
+      - vendor/
     presets:
       - comments
       - common-false-positives
@@ -40,15 +46,21 @@ linters:
         - pattern: "^(print(|ln)|fmt\\.Print(|f|ln)|log\\.(Print(|f|ln)|Fatal(|f|ln)|Panic(|f|ln))|os\\.Exit)$"
           msg: Please use slog for logging, return errors, or panic instead when appropriate.
     sloglint:
-      kv-only: true
-      static-msg: true
-      msg-style: lowercased
       key-naming-case: snake
+      kv-only: true
+      msg-style: lowercased
+      static-msg: true
 
 formatters:
   enable:
     - gofmt
     - goimports
+  exclusions:
+    paths:
+      - builtin/
+      - examples/
+      - third_party/
+      - vendor/
 
 issues:
   max-issues-per-linter: 0

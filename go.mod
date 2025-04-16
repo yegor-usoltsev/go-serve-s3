@@ -10,6 +10,8 @@ require (
 	github.com/victorspringer/http-cache v0.0.0-20240523143319-7d9f48f8ab91
 )
 
+replace github.com/victorspringer/http-cache => ./third_party/http-cache
+
 require (
 	github.com/minio/minio-go/v7 v7.0.90
 	github.com/stretchr/testify v1.10.0
