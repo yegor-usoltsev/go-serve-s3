@@ -77,15 +77,15 @@ func TestNewHandler(t *testing.T) { //nolint:paralleltest
 func TestHealthHandler(t *testing.T) {
 	t.Parallel()
 	url := "/health"
-	assert.HTTPStatusCode(t, HealthHandler, http.MethodGet, url, nil, http.StatusOK)
-	assert.HTTPBodyContains(t, HealthHandler, http.MethodGet, url, nil, "OK")
+	assert.HTTPStatusCode(t, healthHandler, http.MethodGet, url, nil, http.StatusOK)
+	assert.HTTPBodyContains(t, healthHandler, http.MethodGet, url, nil, "OK")
 }
 
 func TestS3Handler(t *testing.T) {
 	client := setupMinio(t)
 	cfg := NewConfigFromEnv()
 
-	handler := NewS3Handler(cfg).ServeHTTP
+	handler := s3Handler(cfg).ServeHTTP
 
 	t.Run("get root directory listing", func(t *testing.T) {
 		t.Parallel()
@@ -141,7 +141,7 @@ func TestS3Handler_Errors(t *testing.T) {
 			CachingCapacityItems: -1,
 			CachingCapacityBytes: 50 * 1024 * 1024,
 		}
-		assert.Panics(t, func() { NewS3Handler(cfg) })
+		assert.Panics(t, func() { s3Handler(cfg) })
 	})
 
 	t.Run("invalid caching capacity bytes", func(t *testing.T) {
@@ -150,7 +150,7 @@ func TestS3Handler_Errors(t *testing.T) {
 			CachingCapacityItems: 1024,
 			CachingCapacityBytes: -1,
 		}
-		assert.Panics(t, func() { NewS3Handler(cfg) })
+		assert.Panics(t, func() { s3Handler(cfg) })
 	})
 
 	t.Run("invalid caching TTL", func(t *testing.T) {
@@ -160,7 +160,7 @@ func TestS3Handler_Errors(t *testing.T) {
 			CachingCapacityBytes: 50 * 1024 * 1024,
 			CachingTTL:           0,
 		}
-		assert.Panics(t, func() { NewS3Handler(cfg) })
+		assert.Panics(t, func() { s3Handler(cfg) })
 	})
 
 	t.Run("invalid AWS config", func(t *testing.T) {
@@ -170,6 +170,24 @@ func TestS3Handler_Errors(t *testing.T) {
 			CachingCapacityBytes: 50 * 1024 * 1024,
 			CachingTTL:           10 * time.Minute,
 		}
-		assert.Panics(t, func() { NewS3Handler(cfg) })
+		assert.Panics(t, func() { s3Handler(cfg) })
+	})
+}
+
+func TestWithRecovery(t *testing.T) {
+	t.Run("normal handler", func(t *testing.T) {
+		t.Parallel()
+		handler := withRecovery(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+			w.WriteHeader(http.StatusOK)
+		})).ServeHTTP
+		assert.HTTPStatusCode(t, handler, http.MethodGet, "/", nil, http.StatusOK)
+	})
+
+	t.Run("panic handler", func(t *testing.T) {
+		t.Parallel()
+		handler := withRecovery(http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {
+			panic("test panic")
+		})).ServeHTTP
+		assert.HTTPStatusCode(t, handler, http.MethodGet, "/", nil, http.StatusInternalServerError)
 	})
 }

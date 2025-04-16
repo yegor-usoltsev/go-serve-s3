@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"net/http"
 
 	awsConfig "github.com/aws/aws-sdk-go-v2/config"
@@ -13,21 +14,21 @@ import (
 )
 
 type Handler struct {
-	*http.ServeMux
+	http.Handler
 }
 
 func NewHandler(cfg Config) *Handler {
-	h := &Handler{ServeMux: http.NewServeMux()}
-	h.HandleFunc("GET /health", HealthHandler)
-	h.Handle("GET /", NewS3Handler(cfg))
-	return h
+	mux := http.NewServeMux()
+	mux.HandleFunc("GET /health", healthHandler)
+	mux.Handle("GET /", s3Handler(cfg))
+	return &Handler{Handler: withRecovery(mux)}
 }
 
-func HealthHandler(w http.ResponseWriter, _ *http.Request) {
+func healthHandler(w http.ResponseWriter, _ *http.Request) {
 	_, _ = fmt.Fprint(w, "OK")
 }
 
-func NewS3Handler(cfg Config) http.Handler {
+func s3Handler(cfg Config) http.Handler {
 	memoryAdapter, err := memory.NewAdapter(
 		memory.AdapterWithAlgorithm(memory.LRU),
 		memory.AdapterWithCapacity(cfg.CachingCapacityItems),
@@ -61,4 +62,16 @@ func NewS3Handler(cfg Config) http.Handler {
 	})
 	s3FS := s3fs.New(s3Client, cfg.S3Bucket, s3fs.WithReadSeeker)
 	return cacheClient.Middleware(http.FileServer(http.FS(s3FS)))
+}
+
+func withRecovery(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer func() {
+			if err := recover(); err != nil {
+				slog.Error("http handler panic recovered", "method", r.Method, "path", r.URL.Path, "error", err)
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			}
+		}()
+		next.ServeHTTP(w, r)
+	})
 }
