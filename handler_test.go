@@ -27,7 +27,7 @@ const (
 func setupMinio(t *testing.T) *minio.Client {
 	t.Helper()
 	container, err := tcMinio.Run(t.Context(), "minio/minio:latest")
-	t.Cleanup(func() { require.NoError(t, tc.TerminateContainer(container)) })
+	tc.CleanupContainer(t, container)
 	require.NoError(t, err)
 
 	endpoint, err := container.ConnectionString(t.Context())

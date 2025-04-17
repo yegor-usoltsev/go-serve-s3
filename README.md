@@ -43,14 +43,14 @@ docker run -d \
 
 | KEY                          | TYPE       | DEFAULT             | REQUIRED |
 | ---------------------------- | ---------- | ------------------- | -------- |
-| `APP_SERVER_HOST`            | `String`   | `0.0.0.0`           | Yes      |
-| `APP_SERVER_PORT`            | `Integer`  | `8080`              | Yes      |
-| `APP_S3_BUCKET`              | `String`   |                     | Yes      |
-| `APP_S3_REGION`              | `String`   |                     | No       |
-| `APP_S3_ENDPOINT_URL`        | `String`   |                     | No       |
-| `APP_S3_USE_PATH_STYLE`      | `Boolean`  |                     | No       |
-| `APP_CACHING_CAPACITY_ITEMS` | `Integer`  | `1024`              | Yes      |
-| `APP_CACHING_CAPACITY_BYTES` | `Integer`  | `52428800` (50 MiB) | Yes      |
+| `APP_SERVER_HOST`            | `string`   | `0.0.0.0`           | Yes      |
+| `APP_SERVER_PORT`            | `uint16`   | `8080`              | Yes      |
+| `APP_S3_BUCKET`              | `string`   |                     | Yes      |
+| `APP_S3_REGION`              | `string`   |                     | No       |
+| `APP_S3_ENDPOINT_URL`        | `string`   |                     | No       |
+| `APP_S3_USE_PATH_STYLE`      | `bool`     |                     | No       |
+| `APP_CACHING_CAPACITY_ITEMS` | `int`      | `1024`              | Yes      |
+| `APP_CACHING_CAPACITY_BYTES` | `int`      | `52428800` (50 MiB) | Yes      |
 | `APP_CACHING_TTL`            | `Duration` | `10m` (10 minutes)  | Yes      |
 
 You should also provide valid AWS credentials using `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`, or through other

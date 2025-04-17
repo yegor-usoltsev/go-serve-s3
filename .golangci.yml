@@ -38,6 +38,7 @@ linters:
           - dupl
           - exhaustruct
           - forcetypeassert
+          - gochecknoglobals
           - gosec
           - wrapcheck
   settings:
