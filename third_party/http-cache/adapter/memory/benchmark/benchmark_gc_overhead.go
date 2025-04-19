@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/allegro/bigcache"
+	"github.com/allegro/bigcache/v3"
 	"github.com/victorspringer/http-cache/adapter/memory"
 )
 
