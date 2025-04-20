@@ -24,5 +24,13 @@
       "datasourceTemplate": "golang-version",
       "depNameTemplate": "go"
     }
+  ],
+  "packageRules": [
+    {
+      "matchFiles": [
+        "third_party/http-cache/go.mod"
+      ],
+      "enabled": false
+    }
   ]
 }
