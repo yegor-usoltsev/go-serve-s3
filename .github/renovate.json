@@ -3,8 +3,10 @@
   "extends": [
     "config:recommended",
     "group:all",
-    "schedule:weekends",
     ":reviewer(yegor-usoltsev)"
+  ],
+  "schedule": [
+    "on the 10th day of the month"
   ],
   "postUpdateOptions": [
     "gomodTidy",
