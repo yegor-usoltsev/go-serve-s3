@@ -14,6 +14,7 @@ linters:
     - maintidx
     - mnd
     - nlreturn
+    - noinlineerr
     - nonamedreturns
     - tagalign
     - testpackage
@@ -21,6 +22,7 @@ linters:
     - varnamelen
     - whitespace
     - wsl
+    - wsl_v5
   exclusions:
     paths:
       - builtin/
