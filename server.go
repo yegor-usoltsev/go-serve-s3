@@ -38,7 +38,8 @@ func (s *Server) StartAsync() {
 	errCh := make(chan error, 1)
 	go func() {
 		defer close(errCh)
-		l, err := net.Listen("tcp", s.Addr)
+		var lc net.ListenConfig
+		l, err := lc.Listen(context.Background(), "tcp", s.Addr)
 		if err != nil {
 			slog.Error("http server unable to listen on address", "addr", s.Addr, "error", err)
 			errCh <- err
