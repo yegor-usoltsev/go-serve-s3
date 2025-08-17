@@ -41,7 +41,8 @@ func TestServer_StartAsync_Stop(t *testing.T) {
 
 func TestServer_StartAsync_AddressAlreadyInUse(t *testing.T) {
 	t.Parallel()
-	listener, err := net.Listen("tcp", "127.0.0.1:0")
+	var lc net.ListenConfig
+	listener, err := lc.Listen(t.Context(), "tcp", "127.0.0.1:0")
 	defer func() { _ = listener.Close() }()
 	require.NoError(t, err)
 	addr := listener.Addr().(*net.TCPAddr)
