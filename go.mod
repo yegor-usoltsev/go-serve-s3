@@ -1,10 +1,10 @@
 module github.com/yegor-usoltsev/go-serve-s3
 
-go 1.24.5
+go 1.25.0
 
 require (
-	github.com/aws/aws-sdk-go-v2/config v1.29.17
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.83.0
+	github.com/aws/aws-sdk-go-v2/config v1.31.0
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.87.0
 	github.com/jszwec/s3fs/v2 v2.0.0
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/victorspringer/http-cache v0.0.0-20240523143319-7d9f48f8ab91
@@ -13,10 +13,10 @@ require (
 replace github.com/victorspringer/http-cache => ./third_party/http-cache
 
 require (
-	github.com/minio/minio-go/v7 v7.0.94
+	github.com/minio/minio-go/v7 v7.0.95
 	github.com/stretchr/testify v1.10.0
-	github.com/testcontainers/testcontainers-go v0.37.0
-	github.com/testcontainers/testcontainers-go/modules/minio v0.37.0
+	github.com/testcontainers/testcontainers-go v0.38.0
+	github.com/testcontainers/testcontainers-go/modules/minio v0.38.0
 )
 
 require (
