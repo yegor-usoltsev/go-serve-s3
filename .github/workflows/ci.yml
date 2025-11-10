@@ -17,7 +17,7 @@ jobs:
           go-version-file: go.mod
       - run: go build -race ./...
       - run: go test -v -race -timeout=100s -covermode=atomic -coverprofile=coverage.txt ./...
-      - uses: golangci/golangci-lint-action@v8
+      - uses: golangci/golangci-lint-action@v9
       - uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
