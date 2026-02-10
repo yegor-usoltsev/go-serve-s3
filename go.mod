@@ -1,10 +1,10 @@
 module github.com/yegor-usoltsev/go-serve-s3
 
-go 1.25.6
+go 1.26.0
 
 require (
 	github.com/aws/aws-sdk-go-v2/config v1.32.7
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.95.1
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.96.0
 	github.com/jszwec/s3fs/v2 v2.0.0
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/victorspringer/http-cache v0.0.0-20240523143319-7d9f48f8ab91
