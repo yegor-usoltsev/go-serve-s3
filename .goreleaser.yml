@@ -66,15 +66,5 @@ release:
   name_template: "v{{ .Version }}"
   footer: |
     ## Docker images
-
-    Docker Hub:
-    - `yusoltsev/go-serve-s3:v{{ .Version }}`
-    - `yusoltsev/go-serve-s3:v{{ .Major }}.{{ .Minor }}`
-    - `yusoltsev/go-serve-s3:v{{ .Major }}`
-    - `yusoltsev/go-serve-s3:latest`
-
-    GHCR:
-    - `ghcr.io/yegor-usoltsev/go-serve-s3:v{{ .Version }}`
-    - `ghcr.io/yegor-usoltsev/go-serve-s3:v{{ .Major }}.{{ .Minor }}`
-    - `ghcr.io/yegor-usoltsev/go-serve-s3:v{{ .Major }}`
-    - `ghcr.io/yegor-usoltsev/go-serve-s3:latest`
+    - [`yusoltsev/go-serve-s3:{{ .Version }}`](https://hub.docker.com/r/yusoltsev/go-serve-s3/tags?name={{ .Version }})
+    - [`ghcr.io/yegor-usoltsev/go-serve-s3:{{ .Version }}`](https://github.com/yegor-usoltsev/go-serve-s3/pkgs/container/go-serve-s3)
