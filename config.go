@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/kelseyhightower/envconfig"
@@ -20,11 +21,11 @@ type Config struct {
 	CachingTTL           time.Duration `split_words:"true" required:"true" default:"10m"`      // 10 minutes
 }
 
-func NewConfigFromEnv() Config {
+func NewConfigFromEnv() (Config, error) {
 	var cfg Config
 	if err := envconfig.Process(envPrefix, &cfg); err != nil {
 		_ = envconfig.Usage(envPrefix, &cfg)
-		panic(err)
+		return cfg, fmt.Errorf("process env config: %w", err)
 	}
-	return cfg
+	return cfg, nil
 }

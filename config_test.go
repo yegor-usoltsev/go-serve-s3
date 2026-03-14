@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestNewConfigFromEnv(t *testing.T) {
@@ -18,7 +19,8 @@ func TestNewConfigFromEnv(t *testing.T) {
 	t.Setenv("APP_CACHING_CAPACITY_BYTES", "26214400")
 	t.Setenv("APP_CACHING_TTL", "42m42s")
 
-	actual := NewConfigFromEnv()
+	actual, err := NewConfigFromEnv()
+	require.NoError(t, err)
 
 	assert.Equal(t, Config{
 		ServerHost:           "127.0.0.1",
@@ -36,7 +38,8 @@ func TestNewConfigFromEnv(t *testing.T) {
 func TestNewConfigFromEnv_Defaults(t *testing.T) {
 	t.Setenv("APP_S3_BUCKET", "test-bucket")
 
-	cfg := NewConfigFromEnv()
+	cfg, err := NewConfigFromEnv()
+	require.NoError(t, err)
 
 	assert.Equal(t, "0.0.0.0", cfg.ServerHost)
 	assert.Equal(t, uint16(8080), cfg.ServerPort)
@@ -48,36 +51,42 @@ func TestNewConfigFromEnv_Defaults(t *testing.T) {
 func TestNewConfigFromEnv_Errors(t *testing.T) {
 	t.Run("missing required field", func(t *testing.T) {
 		t.Parallel()
-		assert.Panics(t, func() { NewConfigFromEnv() })
+		_, err := NewConfigFromEnv()
+		require.Error(t, err)
 	})
 
 	t.Run("invalid server port", func(t *testing.T) {
 		t.Setenv("APP_S3_BUCKET", "test-bucket")
 		t.Setenv("APP_SERVER_PORT", "invalid")
-		assert.Panics(t, func() { NewConfigFromEnv() })
+		_, err := NewConfigFromEnv()
+		require.Error(t, err)
 	})
 
 	t.Run("invalid use path style", func(t *testing.T) {
 		t.Setenv("APP_S3_BUCKET", "test-bucket")
 		t.Setenv("APP_S3_USE_PATH_STYLE", "invalid")
-		assert.Panics(t, func() { NewConfigFromEnv() })
+		_, err := NewConfigFromEnv()
+		require.Error(t, err)
 	})
 
 	t.Run("invalid caching capacity items", func(t *testing.T) {
 		t.Setenv("APP_S3_BUCKET", "test-bucket")
 		t.Setenv("APP_CACHING_CAPACITY_ITEMS", "invalid")
-		assert.Panics(t, func() { NewConfigFromEnv() })
+		_, err := NewConfigFromEnv()
+		require.Error(t, err)
 	})
 
 	t.Run("invalid caching capacity bytes", func(t *testing.T) {
 		t.Setenv("APP_S3_BUCKET", "test-bucket")
 		t.Setenv("APP_CACHING_CAPACITY_BYTES", "invalid")
-		assert.Panics(t, func() { NewConfigFromEnv() })
+		_, err := NewConfigFromEnv()
+		require.Error(t, err)
 	})
 
 	t.Run("invalid caching TTL", func(t *testing.T) {
 		t.Setenv("APP_S3_BUCKET", "test-bucket")
 		t.Setenv("APP_CACHING_TTL", "invalid")
-		assert.Panics(t, func() { NewConfigFromEnv() })
+		_, err := NewConfigFromEnv()
+		require.Error(t, err)
 	})
 }

@@ -1,12 +1,15 @@
 ---
 version: 2
 
+project_name: go-serve-s3
+
 before:
   hooks:
     - go mod tidy
 
 builds:
-  - env:
+  - id: go-serve-s3
+    env:
       - CGO_ENABLED=0
     targets:
       - go_first_class
@@ -16,7 +19,10 @@ builds:
       - -s -w
 
 changelog:
-  disable: true
+  sort: asc
+  filters:
+    exclude:
+      - "^Merge "
 
 archives:
   - format_overrides:
@@ -29,57 +35,46 @@ checksum:
 
 report_sizes: true
 
-dockers:
-  - use: buildx
-    goarch: amd64
-    image_templates:
-      - "yusoltsev/go-serve-s3:v{{ .Version }}-amd64"
-      - "ghcr.io/yegor-usoltsev/go-serve-s3:v{{ .Version }}-amd64"
-    build_flag_templates:
-      - --pull
-      - --platform=linux/amd64
-  - use: buildx
-    goarch: arm64
-    image_templates:
-      - "yusoltsev/go-serve-s3:v{{ .Version }}-arm64"
-      - "ghcr.io/yegor-usoltsev/go-serve-s3:v{{ .Version }}-arm64"
-    build_flag_templates:
-      - --pull
-      - --platform=linux/arm64
-
-docker_manifests:
-  - name_template: "yusoltsev/go-serve-s3:v{{ .Version }}"
-    image_templates:
-      - "yusoltsev/go-serve-s3:v{{ .Version }}-amd64"
-      - "yusoltsev/go-serve-s3:v{{ .Version }}-arm64"
-  - name_template: "ghcr.io/yegor-usoltsev/go-serve-s3:v{{ .Version }}"
-    image_templates:
-      - "ghcr.io/yegor-usoltsev/go-serve-s3:v{{ .Version }}-amd64"
-      - "ghcr.io/yegor-usoltsev/go-serve-s3:v{{ .Version }}-arm64"
-  - name_template: "yusoltsev/go-serve-s3:v{{ .Major }}.{{ .Minor }}"
-    image_templates:
-      - "yusoltsev/go-serve-s3:v{{ .Version }}-amd64"
-      - "yusoltsev/go-serve-s3:v{{ .Version }}-arm64"
-  - name_template: "ghcr.io/yegor-usoltsev/go-serve-s3:v{{ .Major }}.{{ .Minor }}"
-    image_templates:
-      - "ghcr.io/yegor-usoltsev/go-serve-s3:v{{ .Version }}-amd64"
-      - "ghcr.io/yegor-usoltsev/go-serve-s3:v{{ .Version }}-arm64"
-  - name_template: "yusoltsev/go-serve-s3:v{{ .Major }}"
-    image_templates:
-      - "yusoltsev/go-serve-s3:v{{ .Version }}-amd64"
-      - "yusoltsev/go-serve-s3:v{{ .Version }}-arm64"
-  - name_template: "ghcr.io/yegor-usoltsev/go-serve-s3:v{{ .Major }}"
-    image_templates:
-      - "ghcr.io/yegor-usoltsev/go-serve-s3:v{{ .Version }}-amd64"
-      - "ghcr.io/yegor-usoltsev/go-serve-s3:v{{ .Version }}-arm64"
-  - name_template: "yusoltsev/go-serve-s3:latest"
-    image_templates:
-      - "yusoltsev/go-serve-s3:v{{ .Version }}-amd64"
-      - "yusoltsev/go-serve-s3:v{{ .Version }}-arm64"
-  - name_template: "ghcr.io/yegor-usoltsev/go-serve-s3:latest"
-    image_templates:
-      - "ghcr.io/yegor-usoltsev/go-serve-s3:v{{ .Version }}-amd64"
-      - "ghcr.io/yegor-usoltsev/go-serve-s3:v{{ .Version }}-arm64"
+dockers_v2:
+  - id: go-serve-s3-image
+    dockerfile: Dockerfile
+    ids:
+      - go-serve-s3
+    images:
+      - yusoltsev/go-serve-s3
+      - ghcr.io/yegor-usoltsev/go-serve-s3
+    tags:
+      - "v{{ .Version }}"
+      - "v{{ .Major }}.{{ .Minor }}"
+      - "v{{ .Major }}"
+      - "latest"
+    labels:
+      org.opencontainers.image.created: "{{ .Date }}"
+      org.opencontainers.image.description: "Serve static files from S3 with HTTP caching"
+      org.opencontainers.image.name: "{{ .ProjectName }}"
+      org.opencontainers.image.revision: "{{ .FullCommit }}"
+      org.opencontainers.image.source: "{{ .GitURL }}"
+      org.opencontainers.image.version: "{{ .Version }}"
+    platforms:
+      - linux/amd64
+      - linux/arm64
 
 release:
+  github:
+    owner: yegor-usoltsev
+    name: go-serve-s3
   name_template: "v{{ .Version }}"
+  footer: |
+    ## Docker images
+
+    Docker Hub:
+    - `yusoltsev/go-serve-s3:v{{ .Version }}`
+    - `yusoltsev/go-serve-s3:v{{ .Major }}.{{ .Minor }}`
+    - `yusoltsev/go-serve-s3:v{{ .Major }}`
+    - `yusoltsev/go-serve-s3:latest`
+
+    GHCR:
+    - `ghcr.io/yegor-usoltsev/go-serve-s3:v{{ .Version }}`
+    - `ghcr.io/yegor-usoltsev/go-serve-s3:v{{ .Major }}.{{ .Minor }}`
+    - `ghcr.io/yegor-usoltsev/go-serve-s3:v{{ .Major }}`
+    - `ghcr.io/yegor-usoltsev/go-serve-s3:latest`

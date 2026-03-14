@@ -2,27 +2,70 @@
 version: "2"
 
 linters:
-  default: all
-  disable:
-    - cyclop
-    - depguard
-    - funlen
-    - gocognit
-    - gocyclo
-    - gomoddirectives
-    - lll
-    - maintidx
-    - mnd
-    - nlreturn
-    - noinlineerr
-    - nonamedreturns
-    - tagalign
-    - testpackage
-    - tparallel
-    - varnamelen
-    - whitespace
-    - wsl
-    - wsl_v5
+  default: none
+  enable:
+    # bugs and correctness
+    - bodyclose
+    - copyloopvar
+    - errcheck
+    - exhaustive
+    - govet
+    - ineffassign
+    - noctx
+    - staticcheck
+    - unused
+
+    # style and code quality
+    - dupl
+    - forbidigo
+    - gochecknoinits
+    - gocritic
+    - misspell
+    - modernize
+    - nakedret
+    - nestif
+    - nolintlint
+    - prealloc
+    - revive
+    - sloglint
+    - testifylint
+    - unconvert
+    - unparam
+
+    # error handling and security
+    - errorlint
+    - gosec
+    - wrapcheck
+
+  settings:
+    forbidigo:
+      forbid:
+        - pattern: "^(print(|ln)|fmt\\.Print(|f|ln)|os\\.Exit)$"
+          msg: Use structured logging, return errors, or panic instead when appropriate.
+    gocritic:
+      enabled-tags:
+        - performance
+        - style
+        - experimental
+      disabled-checks:
+        - hugeParam
+        - rangeValCopy
+        - wrapperFunc
+    gosec:
+      excludes:
+        - G120 # form data without body size limit
+        - G122 # filepath.Walk/WalkDir TOCTOU
+        - G703 # path traversal via taint analysis
+        - G704 # SSRF via taint analysis
+        - G706 # log injection via taint analysis
+    misspell:
+      locale: US
+    sloglint:
+      key-naming-case: snake
+      kv-only: true
+      msg-style: lowercased
+      static-msg: true
+
   exclusions:
     paths:
       - builtin/
@@ -38,21 +81,9 @@ linters:
       - path: (.+)_test\.go
         linters:
           - dupl
-          - exhaustruct
-          - forcetypeassert
-          - gochecknoglobals
           - gosec
+          - noctx
           - wrapcheck
-  settings:
-    forbidigo:
-      forbid:
-        - pattern: "^(print(|ln)|fmt\\.Print(|f|ln)|log\\.(Print(|f|ln)|Fatal(|f|ln)|Panic(|f|ln))|os\\.Exit)$"
-          msg: Please use slog for logging, return errors, or panic instead when appropriate.
-    sloglint:
-      key-naming-case: snake
-      kv-only: true
-      msg-style: lowercased
-      static-msg: true
 
 formatters:
   enable:

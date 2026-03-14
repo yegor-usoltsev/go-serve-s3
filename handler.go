@@ -17,25 +17,29 @@ type Handler struct {
 	http.Handler
 }
 
-func NewHandler(cfg Config) *Handler {
+func NewHandler(cfg Config) (*Handler, error) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /health", healthHandler)
-	mux.Handle("GET /", s3Handler(cfg))
-	return &Handler{Handler: withRecovery(mux)}
+	s3ContentHandler, err := s3Handler(cfg)
+	if err != nil {
+		return nil, fmt.Errorf("create s3 handler: %w", err)
+	}
+	mux.Handle("GET /", s3ContentHandler)
+	return &Handler{Handler: withRecovery(mux)}, nil
 }
 
 func healthHandler(w http.ResponseWriter, _ *http.Request) {
 	_, _ = fmt.Fprint(w, "OK")
 }
 
-func s3Handler(cfg Config) http.Handler {
+func s3Handler(cfg Config) (http.Handler, error) {
 	memoryAdapter, err := memory.NewAdapter(
 		memory.AdapterWithAlgorithm(memory.LRU),
 		memory.AdapterWithCapacity(cfg.CachingCapacityItems),
 		memory.AdapterWithStorageCapacity(cfg.CachingCapacityBytes),
 	)
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("create memory adapter: %w", err)
 	}
 	cacheClient, err := cache.NewClient(
 		cache.ClientWithAdapter(memoryAdapter),
@@ -44,11 +48,11 @@ func s3Handler(cfg Config) http.Handler {
 		cache.ClientWithExpiresHeader(),
 	)
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("create cache client: %w", err)
 	}
 	awsCfg, err := awsConfig.LoadDefaultConfig(context.Background())
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("load aws config: %w", err)
 	}
 	s3Client := s3.NewFromConfig(awsCfg, func(o *s3.Options) {
 		o.DisableLogOutputChecksumValidationSkipped = true
@@ -61,7 +65,7 @@ func s3Handler(cfg Config) http.Handler {
 		o.UsePathStyle = cfg.S3UsePathStyle
 	})
 	s3FS := s3fs.New(s3Client, cfg.S3Bucket, s3fs.WithReadSeeker)
-	return cacheClient.Middleware(http.FileServer(http.FS(s3FS)))
+	return cacheClient.Middleware(http.FileServer(http.FS(s3FS))), nil
 }
 
 func withRecovery(next http.Handler) http.Handler {

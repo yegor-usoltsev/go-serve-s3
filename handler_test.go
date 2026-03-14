@@ -52,11 +52,14 @@ func setupMinio(t *testing.T) *minio.Client {
 	return client
 }
 
-func TestNewHandler(t *testing.T) { //nolint:paralleltest
+func TestNewHandler(t *testing.T) {
 	setupMinio(t)
-	cfg := NewConfigFromEnv()
+	cfg, err := NewConfigFromEnv()
+	require.NoError(t, err)
 
-	handler := NewHandler(cfg).ServeHTTP
+	serverHandler, err := NewHandler(cfg)
+	require.NoError(t, err)
+	handler := serverHandler.ServeHTTP
 
 	assert.HTTPSuccess(t, handler, http.MethodGet, "/health", nil)
 	assert.HTTPError(t, handler, http.MethodPost, "/health", nil)
@@ -83,9 +86,12 @@ func TestHealthHandler(t *testing.T) {
 
 func TestS3Handler(t *testing.T) {
 	client := setupMinio(t)
-	cfg := NewConfigFromEnv()
+	cfg, err := NewConfigFromEnv()
+	require.NoError(t, err)
 
-	handler := s3Handler(cfg).ServeHTTP
+	s3HTTPHandler, err := s3Handler(cfg)
+	require.NoError(t, err)
+	handler := s3HTTPHandler.ServeHTTP
 
 	t.Run("get root directory listing", func(t *testing.T) {
 		t.Parallel()
@@ -141,7 +147,8 @@ func TestS3Handler_Errors(t *testing.T) {
 			CachingCapacityItems: -1,
 			CachingCapacityBytes: 50 * 1024 * 1024,
 		}
-		assert.Panics(t, func() { s3Handler(cfg) })
+		_, err := s3Handler(cfg)
+		assert.Error(t, err)
 	})
 
 	t.Run("invalid caching capacity bytes", func(t *testing.T) {
@@ -150,7 +157,8 @@ func TestS3Handler_Errors(t *testing.T) {
 			CachingCapacityItems: 1024,
 			CachingCapacityBytes: -1,
 		}
-		assert.Panics(t, func() { s3Handler(cfg) })
+		_, err := s3Handler(cfg)
+		assert.Error(t, err)
 	})
 
 	t.Run("invalid caching TTL", func(t *testing.T) {
@@ -160,7 +168,8 @@ func TestS3Handler_Errors(t *testing.T) {
 			CachingCapacityBytes: 50 * 1024 * 1024,
 			CachingTTL:           0,
 		}
-		assert.Panics(t, func() { s3Handler(cfg) })
+		_, err := s3Handler(cfg)
+		assert.Error(t, err)
 	})
 
 	t.Run("invalid AWS config", func(t *testing.T) {
@@ -170,7 +179,8 @@ func TestS3Handler_Errors(t *testing.T) {
 			CachingCapacityBytes: 50 * 1024 * 1024,
 			CachingTTL:           10 * time.Minute,
 		}
-		assert.Panics(t, func() { s3Handler(cfg) })
+		_, err := s3Handler(cfg)
+		assert.Error(t, err)
 	})
 }
 
