@@ -1,5 +1,6 @@
 FROM alpine:latest
-RUN apk add --no-cache --update ca-certificates tzdata
+RUN apk add --no-cache --update ca-certificates tini tzdata
 ARG TARGETPLATFORM
-ENTRYPOINT ["/go-serve-s3"]
+ENTRYPOINT ["tini", "--"]
+CMD ["/go-serve-s3"]
 COPY $TARGETPLATFORM/go-serve-s3 /
