@@ -20,6 +20,6 @@ jobs:
       - uses: goreleaser/goreleaser-action@v7
         with:
           args: check
-      - uses: codecov/codecov-action@v5
+      - uses: codecov/codecov-action@v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
