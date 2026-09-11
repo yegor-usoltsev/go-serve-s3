@@ -23,18 +23,18 @@ docker run -d \
   yusoltsev/go-serve-s3:latest
 ```
 
-### MinIO
+### Silo
 
-Minimal example using MinIO (local S3-compatible storage):
+Minimal example using [Silo](https://silo.pgsty.com/) (local S3-compatible storage):
 
 ```bash
 docker run -d \
   -e APP_S3_BUCKET=my-bucket \
   -e APP_S3_REGION=us-east-1 \
-  -e APP_S3_ENDPOINT_URL=http://minio:9000 \
+  -e APP_S3_ENDPOINT_URL=http://silo:9000 \
   -e APP_S3_USE_PATH_STYLE=true \
-  -e AWS_ACCESS_KEY_ID=minioadmin \
-  -e AWS_SECRET_ACCESS_KEY=minioadmin \
+  -e AWS_ACCESS_KEY_ID="$MINIO_ROOT_USER" \
+  -e AWS_SECRET_ACCESS_KEY="$MINIO_ROOT_PASSWORD" \
   -p 8080:8080 \
   yusoltsev/go-serve-s3:latest
 ```
