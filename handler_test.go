@@ -7,53 +7,78 @@ import (
 	"testing"
 	"time"
 
-	"github.com/minio/minio-go/v7"
-	"github.com/minio/minio-go/v7/pkg/credentials"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	awsConfig "github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	tc "github.com/testcontainers/testcontainers-go"
-	tcMinio "github.com/testcontainers/testcontainers-go/modules/minio"
+	"github.com/testcontainers/testcontainers-go/wait"
 )
 
 const (
-	minioUser     = "minioadmin"
-	minioPassword = "minioadmin"
+	siloImage     = "docker.io/pgsty/silo:RELEASE.2026-09-03T13-18-01Z"
+	siloUser      = "minioadmin"
+	siloPassword  = "minioadmin"
 	bucketName    = "test-bucket"
 	region        = "us-east-1"
 	objectName    = "lorem-ipsum.txt"
 	objectContent = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.\n"
 )
 
-func setupMinio(t *testing.T) *minio.Client {
+func setupSilo(t *testing.T) *s3.Client {
 	t.Helper()
-	container, err := tcMinio.Run(t.Context(), "minio/minio:latest")
+	container, err := tc.Run(
+		t.Context(),
+		siloImage,
+		tc.WithExposedPorts("9000/tcp"),
+		tc.WithEnv(map[string]string{
+			"MINIO_ROOT_USER":     siloUser,
+			"MINIO_ROOT_PASSWORD": siloPassword,
+		}),
+		tc.WithCmd("server", "/data"),
+		tc.WithWaitStrategy(wait.ForHTTP("/minio/health/live").WithPort("9000/tcp")),
+	)
+	require.NoError(t, err)
 	tc.CleanupContainer(t, container)
+
+	endpoint, err := container.PortEndpoint(t.Context(), "9000/tcp", "http")
 	require.NoError(t, err)
 
-	endpoint, err := container.ConnectionString(t.Context())
+	awsCfg, err := awsConfig.LoadDefaultConfig(
+		t.Context(),
+		awsConfig.WithRegion(region),
+		awsConfig.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(siloUser, siloPassword, "")),
+	)
+	require.NoError(t, err)
+	client := s3.NewFromConfig(awsCfg, func(options *s3.Options) {
+		options.BaseEndpoint = aws.String(endpoint)
+		options.UsePathStyle = true
+	})
+
+	_, err = client.CreateBucket(t.Context(), &s3.CreateBucketInput{Bucket: aws.String(bucketName)})
 	require.NoError(t, err)
 
-	client, err := minio.New(endpoint, &minio.Options{Creds: credentials.NewStaticV4(minioUser, minioPassword, "")})
-	require.NoError(t, err)
-
-	err = client.MakeBucket(t.Context(), bucketName, minio.MakeBucketOptions{Region: region})
-	require.NoError(t, err)
-
-	_, err = client.PutObject(t.Context(), bucketName, objectName, strings.NewReader(objectContent), -1, minio.PutObjectOptions{})
+	_, err = client.PutObject(t.Context(), &s3.PutObjectInput{
+		Bucket: aws.String(bucketName),
+		Key:    aws.String(objectName),
+		Body:   strings.NewReader(objectContent),
+	})
 	require.NoError(t, err)
 
 	t.Setenv("APP_S3_BUCKET", bucketName)
 	t.Setenv("APP_S3_REGION", region)
-	t.Setenv("APP_S3_ENDPOINT_URL", "http://"+endpoint)
+	t.Setenv("APP_S3_ENDPOINT_URL", endpoint)
 	t.Setenv("APP_S3_USE_PATH_STYLE", "true")
-	t.Setenv("AWS_ACCESS_KEY_ID", minioUser)
-	t.Setenv("AWS_SECRET_ACCESS_KEY", minioPassword)
+	t.Setenv("AWS_ACCESS_KEY_ID", siloUser)
+	t.Setenv("AWS_SECRET_ACCESS_KEY", siloPassword)
 
 	return client
 }
 
 func TestNewHandler(t *testing.T) {
-	setupMinio(t)
+	setupSilo(t)
 	cfg, err := NewConfigFromEnv()
 	require.NoError(t, err)
 
@@ -85,7 +110,7 @@ func TestHealthHandler(t *testing.T) {
 }
 
 func TestS3Handler(t *testing.T) {
-	client := setupMinio(t)
+	client := setupSilo(t)
 	cfg, err := NewConfigFromEnv()
 	require.NoError(t, err)
 
@@ -119,7 +144,11 @@ func TestS3Handler(t *testing.T) {
 			}
 			return sb.String()
 		}()
-		_, err := client.PutObject(t.Context(), bucketName, bigObjectName, strings.NewReader(bigObjectContent), -1, minio.PutObjectOptions{})
+		_, err := client.PutObject(t.Context(), &s3.PutObjectInput{
+			Bucket: aws.String(bucketName),
+			Key:    aws.String(bigObjectName),
+			Body:   strings.NewReader(bigObjectContent),
+		})
 		require.NoError(t, err)
 
 		url := "/" + bigObjectName

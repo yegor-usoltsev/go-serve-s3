@@ -25,6 +25,18 @@
       ],
       "datasourceTemplate": "golang-version",
       "depNameTemplate": "go"
+    },
+    {
+      "customType": "regex",
+      "description": "Update Silo test image",
+      "managerFilePatterns": [
+        "/(^|/)handler_test\\.go$/"
+      ],
+      "matchStrings": [
+        "siloImage\\s*=\\s*\"docker\\.io/pgsty/silo:(?<currentValue>RELEASE\\.[^\"]+)\""
+      ],
+      "datasourceTemplate": "docker",
+      "depNameTemplate": "pgsty/silo"
     }
   ],
   "packageRules": [
