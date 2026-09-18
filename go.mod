@@ -2,8 +2,6 @@ module github.com/yegor-usoltsev/go-serve-s3
 
 go 1.27.1
 
-replace github.com/victorspringer/http-cache => ./third_party/http-cache
-
 require (
 	github.com/aws/aws-sdk-go-v2 v1.47.0
 	github.com/aws/aws-sdk-go-v2/config v1.33.4

@@ -175,6 +175,7 @@ func TestS3Handler_Errors(t *testing.T) {
 		cfg := Config{
 			CachingCapacityItems: -1,
 			CachingCapacityBytes: 50 * 1024 * 1024,
+			CachingTTL:           10 * time.Minute,
 		}
 		_, err := s3Handler(cfg)
 		assert.Error(t, err)
@@ -185,6 +186,7 @@ func TestS3Handler_Errors(t *testing.T) {
 		cfg := Config{
 			CachingCapacityItems: 1024,
 			CachingCapacityBytes: -1,
+			CachingTTL:           10 * time.Minute,
 		}
 		_, err := s3Handler(cfg)
 		assert.Error(t, err)

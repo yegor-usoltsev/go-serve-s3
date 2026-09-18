@@ -33,6 +33,9 @@ func healthHandler(w http.ResponseWriter, _ *http.Request) {
 }
 
 func s3Handler(cfg Config) (http.Handler, error) {
+	if cfg.CachingTTL <= 0 {
+		return nil, fmt.Errorf("cache TTL must be positive: %v", cfg.CachingTTL)
+	}
 	memoryAdapter, err := memory.NewAdapter(
 		memory.AdapterWithAlgorithm(memory.LRU),
 		memory.AdapterWithCapacity(cfg.CachingCapacityItems),
