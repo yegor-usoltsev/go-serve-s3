@@ -7,7 +7,14 @@
 [![Docker Image (ghcr.io)](https://img.shields.io/docker/v/yusoltsev/go-serve-s3?label=ghcr.io&sort=semver)](https://github.com/yegor-usoltsev/go-serve-s3/pkgs/container/go-serve-s3)
 [![Docker Image Size](https://img.shields.io/docker/image-size/yusoltsev/go-serve-s3?sort=semver&arch=amd64)](https://hub.docker.com/r/yusoltsev/go-serve-s3/tags)
 
-A compact tool for serving static files from AWS S3 object storage with in-memory caching.
+A Go HTTP server that serves objects from an AWS S3 bucket and caches responses in memory for repeated requests. The
+URL path maps to an object key, and `GET /health` returns `OK`.
+
+For example, after starting the container, request `images/logo.svg` with:
+
+```bash
+curl http://localhost:8080/images/logo.svg
+```
 
 ## Usage
 
@@ -43,15 +50,15 @@ docker run -d \
 
 | KEY                          | TYPE       | DEFAULT             | REQUIRED |
 | ---------------------------- | ---------- | ------------------- | -------- |
-| `APP_SERVER_HOST`            | `string`   | `0.0.0.0`           | Yes      |
-| `APP_SERVER_PORT`            | `uint16`   | `8080`              | Yes      |
+| `APP_SERVER_HOST`            | `string`   | `0.0.0.0`           | No       |
+| `APP_SERVER_PORT`            | `uint16`   | `8080`              | No       |
 | `APP_S3_BUCKET`              | `string`   |                     | Yes      |
 | `APP_S3_REGION`              | `string`   |                     | No       |
 | `APP_S3_ENDPOINT_URL`        | `string`   |                     | No       |
 | `APP_S3_USE_PATH_STYLE`      | `bool`     |                     | No       |
-| `APP_CACHING_CAPACITY_ITEMS` | `int`      | `1024`              | Yes      |
-| `APP_CACHING_CAPACITY_BYTES` | `int`      | `52428800` (50 MiB) | Yes      |
-| `APP_CACHING_TTL`            | `Duration` | `10m` (10 minutes)  | Yes      |
+| `APP_CACHING_CAPACITY_ITEMS` | `int`      | `1024`              | No       |
+| `APP_CACHING_CAPACITY_BYTES` | `int`      | `52428800` (50 MiB) | No       |
+| `APP_CACHING_TTL`            | `Duration` | `10m` (10 minutes)  | No       |
 
 You should also provide valid AWS credentials using `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`, or through other
 supported environment variables. For details, refer to
