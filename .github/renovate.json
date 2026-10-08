@@ -38,13 +38,5 @@
       "datasourceTemplate": "docker",
       "depNameTemplate": "pgsty/silo"
     }
-  ],
-  "packageRules": [
-    {
-      "matchFileNames": [
-        "third_party/http-cache/go.mod"
-      ],
-      "enabled": false
-    }
   ]
 }
