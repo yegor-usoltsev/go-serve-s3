@@ -3,6 +3,7 @@
   "extends": [
     "config:recommended",
     "group:all",
+    ":enablePreCommit",
     ":reviewer(yegor-usoltsev)"
   ],
   "schedule": [
