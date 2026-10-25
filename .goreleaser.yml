@@ -66,5 +66,5 @@ release:
   name_template: "v{{ .Version }}"
   footer: |
     ## Docker images
-    - [`yusoltsev/go-serve-s3:{{ .Version }}`](https://hub.docker.com/r/yusoltsev/go-serve-s3/tags?name={{ .Version }})
-    - [`ghcr.io/yegor-usoltsev/go-serve-s3:{{ .Version }}`](https://github.com/yegor-usoltsev/go-serve-s3/pkgs/container/go-serve-s3)
+    - [`yusoltsev/go-serve-s3:v{{ .Version }}`](https://hub.docker.com/r/yusoltsev/go-serve-s3/tags?name=v{{ .Version }})
+    - [`ghcr.io/yegor-usoltsev/go-serve-s3:v{{ .Version }}`](https://github.com/yegor-usoltsev/go-serve-s3/pkgs/container/go-serve-s3)
