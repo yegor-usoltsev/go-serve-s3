@@ -1,0 +1,4 @@
+[tools]
+go = "1.27.2"
+# Installs the Git hook on every `mise install` and avoids running the global prek hook twice.
+prek = { version = "latest", postinstall = { run = "prek install && git config hook.prek.enabled false", when = "always" } }
